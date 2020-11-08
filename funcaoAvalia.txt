@@ -34,5 +34,20 @@ pontos(2,[_,X,_,X]):-!.
 pontos(2,[_,_,X,X]):-!.
 pontos(0,[_|_]).
 
+/* recebe uma lista de listas que representa o cubo magico 2 x 2.
+ * simula o movimento de giro do cubo de modo que as dois blocos superiores da fente sao girados para direita
+ * o topo faz um giro 90 graus e a parte inferior nao é alterada.
+ */
+
+giro_direita([X,Y|_],[_,_|T],[X,Y|T]).
+giro_topo_direita([_1,_2,_3,_4],[_2,_4,_1,_3]).
+
+move_direita(X,[F,R,B,L,T,U]):-
+    giro_direita(F,R,_r),
+    giro_direita(R,B,_b),
+    giro_direita(B,L,_l),    
+    giro_direita(L,F,_f),
+    giro_topo_direita(T,_t),
+    avalia_pontos(X,[_f,_r,_b,_l,_t,U]).
 
 
