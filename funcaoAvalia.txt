@@ -87,6 +87,24 @@ move_cima(X,[F,R,B,L,T,U]):-
     avalia_pontos(X,[_f,_r,_b,L,_t,_u]).
 
 
+/* recebe uma lista de listas que representa o cubo magico 2 x 2.
+ * simula o movimento de giro do cubo de modo que as dois blocos da direita sao girados para baixo
+ * a parte direita faz um giro 90 graus para esquera e a parte esquerda nao é alterada.
+ * teste: move_baixo(X, [[a, f, a, f], [b, b, b, b], [c, e, c, e], [d, d, d, d], [e, a, e, a], [f, c, f, c]]).
+ */
+
+giro_baixo([_,X,_,Y],[A,_,B,_],[A,X,B,Y]).
+giro_direita_baixo([_1,_2,_3,_4],[_2,_4,_1,_3]).
+
+move_baixo(X,[F,R,B,L,T,U]):-
+    giro_baixo(T,F,_f),
+    giro_baixo(B,T,_t),
+    giro_baixo(U,B,_b),    
+    giro_baixo(F,U,_u),
+    giro_direita_baixo(R,_r),
+    avalia_pontos(X,[_f,_r,_b,L,_t,_u]).
+
+
     
 
 
