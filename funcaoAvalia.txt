@@ -68,6 +68,25 @@ move_esquerda(X,[F,R,B,L,T,U]):-
     giro_esquerda(F,L,_l),
     giro_topo_esquerda(T,_t),
     avalia_pontos(X,[_f,_r,_b,_l,_t,U]).
+
+/* recebe uma lista de listas que representa o cubo magico 2 x 2.
+ * simula o movimento de giro do cubo de modo que as dois blocos da direita sao girados para cima
+ * a direita faz um giro 90 graus e a parte esquerda nao é alterada.
+ * teste: move_cima(X,[[a,e,a,e],[b,b,b,b],[c,f,c,f],[d,d,d,d],[e,c,e,c],[f,a,f,a]]).
+ */
+
+giro_cima([_,X,_,Y],[A,_,B,_],[A,X,B,Y]).
+giro_direita_cima([_1,_2,_3,_4],[_3,_1,_4,_2]).
+
+move_cima(X,[F,R,B,L,T,U]):-
+    giro_cima(F,T,_t),
+    giro_cima(T,B,_b),
+    giro_cima(B,U,_u),    
+    giro_cima(U,F,_f),
+    giro_direita_cima(R,_r),
+    avalia_pontos(X,[_f,_r,_b,L,_t,_u]).
+
+
     
 
 
