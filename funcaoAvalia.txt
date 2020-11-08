@@ -37,6 +37,7 @@ pontos(0,[_|_]).
 /* recebe uma lista de listas que representa o cubo magico 2 x 2.
  * simula o movimento de giro do cubo de modo que as dois blocos superiores da fente sao girados para direita
  * o topo faz um giro 90 graus e a parte inferior nao é alterada.
+ * teste: move_direita(X,[[b, b, a, a], [c, c, b, b], [d, d, c, c], [a, a, d, d], [e, e, e, e], [f, f, f, f]]).
  */
 
 giro_direita([X,Y|_],[_,_|T],[X,Y|T]).
@@ -49,5 +50,24 @@ move_direita(X,[F,R,B,L,T,U]):-
     giro_direita(L,F,_f),
     giro_topo_direita(T,_t),
     avalia_pontos(X,[_f,_r,_b,_l,_t,U]).
+
+
+/* recebe uma lista de listas que representa o cubo magico 2 x 2.
+ * simula o movimento de giro do cubo de modo que as dois blocos superiores da fente sao girados para esquerda
+ * o topo faz um giro 90 graus e a parte inferior nao é alterada.
+ * teste: move_esquerda(X,[[d, d, a, a], [a, a, b, b], [b, b, c, c], [c, c, d, d], [e, e, e, e], [f, f, f, f]]).
+ */
+
+giro_esquerda([X,Y|_],[_,_|T],[X,Y|T]).				%funcao identica a giro_direita
+giro_topo_esquerda([_1,_2,_3,_4],[_3,_1,_4,_2]).
+
+move_esquerda(X,[F,R,B,L,T,U]):-
+    giro_esquerda(R,F,_f),
+    giro_esquerda(B,R,_r),
+    giro_esquerda(L,B,_b),    
+    giro_esquerda(F,L,_l),
+    giro_topo_esquerda(T,_t),
+    avalia_pontos(X,[_f,_r,_b,_l,_t,U]).
+    
 
 
