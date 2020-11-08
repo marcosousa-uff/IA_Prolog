@@ -1,0 +1,38 @@
+/* recebe uma lista de listas que representa os 6 lados do cubo magico 2 x 2
+ * que avalia quantas cores sao iguais em cada lado e faz a soma total dos valores obitidos
+ * caso haja 4 cores iguais em um lado o valor desse lado e 4
+ * caso haja 3 cores iguais em um lado o valor desse lado e 3
+ * caso haja 2 cores iguais em um lado o valor desse lado e 2
+ * caso haja 2 pares de cores iguais em um lado o valor desse lado e 0
+ * teste usando como exemplo um cubo resolvido avalia_pontos(X,[[a,a,a,a],[b,b,b,b],[c,c,c,c],[d,d,d,d],[e,e,e,e],[f,f,f,f]]).
+*/
+
+avalia_pontos(0,[]).
+avalia_pontos(X,[H|T]):-
+    avalia_pontos(S,T),
+    pontos(Y,H),
+    X is S + Y.
+
+pontos(4,[X,X,X,X]):-!.
+
+pontos(0,[X,X,Y,Y]):-!.
+pontos(0,[X,Y,Y,X]):-!.
+pontos(0,[X,Y,X,Y]):-!.
+
+pontos(3,[X,X,X,_]):-!.
+pontos(3,[_,X,X,X]):-!.
+pontos(3,[X,_,X,X]):-!.
+pontos(3,[X,X,_,X]):-!.
+
+pontos(2,[X,X|_]):-!.
+pontos(2,[X,_,X,_]):-!.
+pontos(2,[X,_,_,X]):-!.
+
+pontos(2,[_,X,X,_]):-!.
+pontos(2,[_,X,_,X]):-!.
+
+pontos(2,[_,_,X,X]):-!.
+pontos(0,[_|_]).
+
+
+
