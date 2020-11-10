@@ -6,7 +6,6 @@
  * caso haja 2 pares de cores iguais em um lado o valor desse lado e 0
  * teste usando como exemplo um cubo resolvido avalia_pontos(X,[[a,a,a,a],[b,b,b,b],[c,c,c,c],[d,d,d,d],[e,e,e,e],[f,f,f,f]]).
 */
-
 avalia_pontos(0,[]).
 avalia_pontos(X,[H|T]):-
     avalia_pontos(S,T),
@@ -43,12 +42,13 @@ pontos(0,[_|_]).
 giro_direita([X,Y|_],[_,_|T],[X,Y|T]).
 giro_topo_direita([_1,_2,_3,_4],[_2,_4,_1,_3]).
 
-move_direita(X,[F,R,B,L,T,U]):-
+move_direita(X,[F,R,B,L,T,U],Lista):-
     giro_direita(F,R,_r),
     giro_direita(R,B,_b),
     giro_direita(B,L,_l),    
     giro_direita(L,F,_f),
     giro_topo_direita(T,_t),
+    Lista = [_f,_r,_b,_l,_t,U],
     avalia_pontos(X,[_f,_r,_b,_l,_t,U]).
 
 
@@ -58,16 +58,19 @@ move_direita(X,[F,R,B,L,T,U]):-
  * teste: move_esquerda(X,[[d, d, a, a], [a, a, b, b], [b, b, c, c], [c, c, d, d], [e, e, e, e], [f, f, f, f]]).
  */
 
+
 giro_esquerda([X,Y|_],[_,_|T],[X,Y|T]).				%funcao identica a giro_direita
 giro_topo_esquerda([_1,_2,_3,_4],[_3,_1,_4,_2]).
 
-move_esquerda(X,[F,R,B,L,T,U]):-
+move_esquerda(X,[F,R,B,L,T,U],Lista):-
     giro_esquerda(R,F,_f),
     giro_esquerda(B,R,_r),
     giro_esquerda(L,B,_b),    
     giro_esquerda(F,L,_l),
     giro_topo_esquerda(T,_t),
+    Lista =[_f,_r,_b,_l,_t,U],
     avalia_pontos(X,[_f,_r,_b,_l,_t,U]).
+   
 
 /* recebe uma lista de listas que representa o cubo magico 2 x 2.
  * simula o movimento de giro do cubo de modo que as dois blocos da direita sao girados para cima
@@ -78,14 +81,14 @@ move_esquerda(X,[F,R,B,L,T,U]):-
 giro_cima([_,X,_,Y],[A,_,B,_],[A,X,B,Y]).
 giro_direita_cima([_1,_2,_3,_4],[_3,_1,_4,_2]).
 
-move_cima(X,[F,R,B,L,T,U]):-
+move_cima(X,[F,R,B,L,T,U],Lista):-
     giro_cima(F,T,_t),
     giro_cima(T,B,_b),
     giro_cima(B,U,_u),    
     giro_cima(U,F,_f),
     giro_direita_cima(R,_r),
+    Lista = [_f,_r,_b,L,_t,_u],
     avalia_pontos(X,[_f,_r,_b,L,_t,_u]).
-
 
 /* recebe uma lista de listas que representa o cubo magico 2 x 2.
  * simula o movimento de giro do cubo de modo que as dois blocos da direita sao girados para baixo
@@ -96,15 +99,55 @@ move_cima(X,[F,R,B,L,T,U]):-
 giro_baixo([_,X,_,Y],[A,_,B,_],[A,X,B,Y]).
 giro_direita_baixo([_1,_2,_3,_4],[_2,_4,_1,_3]).
 
-move_baixo(X,[F,R,B,L,T,U]):-
+move_baixo(X,[F,R,B,L,T,U],Lista):-
     giro_baixo(T,F,_f),
     giro_baixo(B,T,_t),
     giro_baixo(U,B,_b),    
     giro_baixo(F,U,_u),
     giro_direita_baixo(R,_r),
+    Lista = [_f,_r,_b,L,_t,_u],
     avalia_pontos(X,[_f,_r,_b,L,_t,_u]).
 
 
-    
+/*recebe a lista que representa o cubo magico 2 x 2
+ * chama a função avalia_pontos para ver se o cubo ja esta resolvido
+ * realiza os 6 tipos de movimentos e compara qual foi o melhor
+ * chama a função recursivamente seguindo o caminho do melhor movimento
+ */
 
+resolve_cubo([F,D,B,L,T,U]):-
+    avalia_pontos(X,[F,D,B,L,T,U]),
+    X = 24 ->  
+    	write('  cubo resolvido!!! ' [F,D,B,L,T,U] )
+    ;   
+    	cubo([F,D,B,L,T,U]).
+    	
+cubo([F,D,B,L,T,U]):-
+    move_direita(Valor1,[F,D,B,L,T,U],Lista1),
+    move_esquerda(Valor2,[F,D,B,L,T,U],Lista2),
+    X is max(Valor1,Valor2),
+    move_cima(Valor3,[F,D,B,L,T,U],Lista3),
+    move_baixo(Valor4,[F,D,B,L,T,U],Lista4),
+    Y is max(Valor3,Valor4),
+    giro_topo_direita(T,_t),
+    giro_topo_direita(U,_u),
+    move_cima(Valor5,[D,B,L,F,_t,_u],Lista5),
+    move_baixo(Valor6,[D,B,L,F,_t,_u],Lista6),
+    Z is max(Valor5,Valor6),
+    G is max(X,Y),
+    J is max(G,Z),
+    switch(J,[Valor1,Lista1,Valor2,Lista2,Valor3,Lista3,Valor4,Lista4,Valor5,Lista5,Valor6,Lista6]).
+
+switch(X, [Val,Lista|Cases]) :-
+    ( X=Val ->
+        call(resolve_cubo(Lista))
+    ;
+        switch(X, Cases)
+    ).
+    
+    
+    
+                       
+    
+    
 
