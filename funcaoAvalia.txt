@@ -14,9 +14,9 @@ avalia_pontos(X,[H|T]):-
 
 pontos(4,[X,X,X,X]):-!.
 
-pontos(0,[X,X,Y,Y]):-!.
-pontos(0,[X,Y,Y,X]):-!.
-pontos(0,[X,Y,X,Y]):-!.
+pontos(2,[X,X,Y,Y]):-!.
+pontos(2,[X,Y,Y,X]):-!.
+pontos(2,[X,Y,X,Y]):-!.
 
 pontos(3,[X,X,X,_]):-!.
 pontos(3,[_,X,X,X]):-!.
@@ -33,16 +33,41 @@ pontos(2,[_,X,_,X]):-!.
 pontos(2,[_,_,X,X]):-!.
 pontos(0,[_|_]).
 
+
+/*
+ *funcoes auxiliares   
+*/
+
+add_tail([],X,[X]).
+add_tail([H|T],X,[H|L]):-add_tail(T,X,L).
+
+extrai([X,Lista,M],Lista,M,X).
+
+descarta([],_).
+descarta([H|T],Lista):-
+         extrai(H,_,_,X),
+    	X=\=0,
+    	descarta(T,L),
+   		Lista = [H|L].
+descarta([H|T],Lista):-
+         extrai(H,_,_,0),
+    	descarta(T,Lista).
+
+resolvido(_,24,M):-
+    writeln(M).
+resolvido(_,_,_).
+
 /* recebe uma lista de listas que representa o cubo magico 2 x 2.
  * simula o movimento de giro do cubo de modo que as dois blocos superiores da fente sao girados para direita
- * o topo faz um giro 90 graus e a parte inferior nao é alterada.
+ * o topo faz um giro 90 graus e a parte inferior nao ? alterada.
  * teste: move_direita(X,[[b, b, a, a], [c, c, b, b], [d, d, c, c], [a, a, d, d], [e, e, e, e], [f, f, f, f]]).
  */
 
 giro_direita([X,Y|_],[_,_|T],[X,Y|T]).
 giro_topo_direita([_1,_2,_3,_4],[_2,_4,_1,_3]).
 
-move_direita(X,[F,R,B,L,T,U],Lista):-
+move_direita(e,0,Lista,Lista).
+move_direita(_,X,[F,R,B,L,T,U],Lista):-
     giro_direita(F,R,_r),
     giro_direita(R,B,_b),
     giro_direita(B,L,_l),    
@@ -54,7 +79,7 @@ move_direita(X,[F,R,B,L,T,U],Lista):-
 
 /* recebe uma lista de listas que representa o cubo magico 2 x 2.
  * simula o movimento de giro do cubo de modo que as dois blocos superiores da fente sao girados para esquerda
- * o topo faz um giro 90 graus e a parte inferior nao é alterada.
+ * o topo faz um giro 90 graus e a parte inferior nao ? alterada.
  * teste: move_esquerda(X,[[d, d, a, a], [a, a, b, b], [b, b, c, c], [c, c, d, d], [e, e, e, e], [f, f, f, f]]).
  */
 
@@ -62,7 +87,8 @@ move_direita(X,[F,R,B,L,T,U],Lista):-
 giro_esquerda([X,Y|_],[_,_|T],[X,Y|T]).				%funcao identica a giro_direita
 giro_topo_esquerda([_1,_2,_3,_4],[_3,_1,_4,_2]).
 
-move_esquerda(X,[F,R,B,L,T,U],Lista):-
+move_esquerda(d,0,Lista,Lista).
+move_esquerda(_,X,[F,R,B,L,T,U],Lista):-
     giro_esquerda(R,F,_f),
     giro_esquerda(B,R,_r),
     giro_esquerda(L,B,_b),    
@@ -74,14 +100,15 @@ move_esquerda(X,[F,R,B,L,T,U],Lista):-
 
 /* recebe uma lista de listas que representa o cubo magico 2 x 2.
  * simula o movimento de giro do cubo de modo que as dois blocos da direita sao girados para cima
- * a direita faz um giro 90 graus e a parte esquerda nao é alterada.
+ * a direita faz um giro 90 graus e a parte esquerda nao ? alterada.
  * teste: move_cima(X,[[a,e,a,e],[b,b,b,b],[c,f,c,f],[d,d,d,d],[e,c,e,c],[f,a,f,a]]).
  */
 
 giro_cima([_,X,_,Y],[A,_,B,_],[A,X,B,Y]).
 giro_direita_cima([_1,_2,_3,_4],[_3,_1,_4,_2]).
 
-move_cima(X,[F,R,B,L,T,U],Lista):-
+move_cima(b,0,Lista,Lista).
+move_cima(_,X,[F,R,B,L,T,U],Lista):-
     giro_cima(F,T,_t),
     giro_cima(T,B,_b),
     giro_cima(B,U,_u),    
@@ -90,16 +117,29 @@ move_cima(X,[F,R,B,L,T,U],Lista):-
     Lista = [_f,_r,_b,L,_t,_u],
     avalia_pontos(X,[_f,_r,_b,L,_t,_u]).
 
+move_cima2(u,0,Lista,Lista).
+move_cima2(_,X,[F,R,B,L,T,U],Lista):-
+    giro_topo_esquerda(T,_nt),
+    giro_topo_esquerda(U,_nu),
+    giro_cima(R,_nt,_t),
+    giro_cima(_nt,L,_l),
+    giro_cima(L,_nu,_u),    
+    giro_cima(_nu,R,_r),
+    giro_direita_cima(B,_b),
+    Lista = [F,_r,_b,_l,_t,_u],
+    avalia_pontos(X,Lista).
+
 /* recebe uma lista de listas que representa o cubo magico 2 x 2.
  * simula o movimento de giro do cubo de modo que as dois blocos da direita sao girados para baixo
- * a parte direita faz um giro 90 graus para esquera e a parte esquerda nao é alterada.
+ * a parte direita faz um giro 90 graus para esquera e a parte esquerda nao ? alterada.
  * teste: move_baixo(X, [[a, f, a, f], [b, b, b, b], [c, e, c, e], [d, d, d, d], [e, a, e, a], [f, c, f, c]]).
  */
 
 giro_baixo([_,X,_,Y],[A,_,B,_],[A,X,B,Y]).
 giro_direita_baixo([_1,_2,_3,_4],[_2,_4,_1,_3]).
 
-move_baixo(X,[F,R,B,L,T,U],Lista):-
+move_baixo(c,0,Lista,Lista).
+move_baixo(_,X,[F,R,B,L,T,U],Lista):-
     giro_baixo(T,F,_f),
     giro_baixo(B,T,_t),
     giro_baixo(U,B,_b),    
@@ -108,46 +148,110 @@ move_baixo(X,[F,R,B,L,T,U],Lista):-
     Lista = [_f,_r,_b,L,_t,_u],
     avalia_pontos(X,[_f,_r,_b,L,_t,_u]).
 
+move_baixo2(t,0,Lista,Lista).
+move_baixo2(_,X,[F,R,B,L,T,U],Lista):-
+    giro_topo_esquerda(T,_nt),
+    giro_topo_esquerda(U,_nu),
+    giro_baixo(_nt,R,_r),
+    giro_baixo(L,_nt,_t),
+    giro_baixo(_nu,L,_l),    
+    giro_baixo(R,_nu,_u),
+    giro_direita_baixo(B,_b),
+    Lista = [F,_r,_b,_l,_t,_u],
+    avalia_pontos(X,Lista).
 
-/*recebe a lista que representa o cubo magico 2 x 2
- * chama a função avalia_pontos para ver se o cubo ja esta resolvido
+/*
+ * recebe a lista que representa o cubo magico 2 x 2
+ * chama a fun??o avalia_pontos para ver se o cubo ja esta resolvido
  * realiza os 6 tipos de movimentos e compara qual foi o melhor
- * chama a função recursivamente seguindo o caminho do melhor movimento
+ * chama a fun??o recursivamente seguindo o caminho do melhor movimento
  */
 
-resolve_cubo([F,D,B,L,T,U]):-
+
+resolve_cubo(Precisao,[F,D,B,L,T,U]):-
     avalia_pontos(X,[F,D,B,L,T,U]),
-    X = 24 ->  
-    	write('  cubo resolvido!!! ' [F,D,B,L,T,U] )
-    ;   
-    	cubo([F,D,B,L,T,U]).
-    	
-cubo([F,D,B,L,T,U]):-
-    move_direita(Valor1,[F,D,B,L,T,U],Lista1),
-    move_esquerda(Valor2,[F,D,B,L,T,U],Lista2),
-    X is max(Valor1,Valor2),
-    move_cima(Valor3,[F,D,B,L,T,U],Lista3),
-    move_baixo(Valor4,[F,D,B,L,T,U],Lista4),
-    Y is max(Valor3,Valor4),
-    giro_topo_direita(T,_t),
-    giro_topo_direita(U,_u),
-    move_cima(Valor5,[D,B,L,F,_t,_u],Lista5),
-    move_baixo(Valor6,[D,B,L,F,_t,_u],Lista6),
-    Z is max(Valor5,Valor6),
-    G is max(X,Y),
-    J is max(G,Z),
-    switch(J,[Valor1,Lista1,Valor2,Lista2,Valor3,Lista3,Valor4,Lista4,Valor5,Lista5,Valor6,Lista6]).
+    resolvido([F,D,B,L,T,U],X,inicio),  
+    cubo(0,[[X,[F,D,B,L,T,U],inicio]],_,Precisao),
+    write('cubo resolvido').
 
-switch(X, [Val,Lista|Cases]) :-
-    ( X=Val ->
-        call(resolve_cubo(Lista))
-    ;
-        switch(X, Cases)
-    ).
-    
-    
-    
-                       
-    
-    
+/*
+ * cubo(N,[[X,[F,D,B,L,T,U],inicio]],Movimentos,Precisao)
+ * funcao que ordena o cubo
+ * seus parametros sao:
+ * um contador N
+ * um valor que indica a pontuacao do estado atual
+ * a lista contendo o cubo
+ * a palavra 'inicio' que marca o inicio nos caminho da resolucao
+ * uma variavel que guarda os movimentos
+ * e a precisao que serve para limitar a quandidade de movimentos possiveis
+ * a funcao retorna todas as solucoes possiveis dentro do limite da precisao
+ * descartando movimentos inuteis como mover para direita e em seguida para esquerda
+ * 
+*/
+cubo(_,[],_,_).
+cubo(_,[[24,Lista,M]|_],Movimentos,_):- 
+     add_tail(Movimentos,M,_m),
+     resolvido( Lista,24,_m).
+cubo(X,[_|T],M,X):-   
+    cubo(X,T,M,X).
+cubo(X,[H|T],Movimentos,_):-
+    extrai(H,_,_,0),
+    cubo(X,T,Movimentos,_).
+     
+cubo(N,[H|Calda],Movimentos,P):-
+    cubo(N,Calda,Movimentos,P),%chama recursivamente a funcao ate encontrar o final da lista
+    extrai(H,Lista,M,Val),
+    add_tail(Movimentos,M,_m),%armazena caminho percorrido
+    resolvido(Lista,Val,_m),
+    _n is N + 1,
+    move_direita(M,Valor1,Lista,Lista1),
+    move_esquerda(M,Valor2,Lista,Lista2),
+    move_cima(M,Valor3,Lista,Lista3),
+    move_baixo(M,Valor4,Lista,Lista4), 
+    move_cima2(M,Valor5,Lista,Lista5),
+    move_baixo2(M,Valor6,Lista,Lista6),
+    descarta([[Valor1,Lista1,d],[Valor2,Lista2,e],[Valor3,Lista3,c],[Valor4,Lista4,b],[Valor5,Lista5,t],[Valor6,Lista6,u]],ListaDescartada),
+    quicksort(ListaDescartada,ListaOrdenada),
+    cubo(_n,ListaOrdenada,_m,P),!.
 
+
+%ordena a lista do menos para o maior
+
+quicksort([],[]).
+quicksort([X|Cauda],ListaOrd):-
+	particionar(X,Cauda,Menor,Maior),
+	quicksort(Menor,MenorOrd),
+	quicksort(Maior,MaiorOrd),
+	append(MenorOrd,[X|MaiorOrd],ListaOrd).
+
+particionar(_,[],[],[]).
+particionar(X,[Y|Cauda],[Y|Menor],Maior):-
+	maior(X,Y),!,
+	particionar(X,Cauda,Menor,Maior).
+particionar(X,[Y|Cauda],Menor,[Y|Maior]):-
+	particionar(X,Cauda,Menor,Maior).
+
+maior([F1|_],[F2|_]) :- F1 > F2.
+
+
+    
+    
+/** <examples>
+?- move_direita(i,_,[[a,a,a,a],[b,b,b,b],[c,c,c,c],[d,d,d,d],[e,e,e,e],[f,f,f,f]],X),
+   move_direita(i,_,X,Y),
+   move_cima(i,_,Y,Z),
+   move_direita(i,_,Z,A),
+   resolve_cubo(4,A).
+
+comparando resultados:
+   
+?- move_esquerda(i,_,[[b, b, a, f], [c, f, b, d], [b, d, c, e], [a, e, d, d], [c, a, e, e], [f, a, f, c]],A),
+   move_baixo(i,_,A,B),
+   move_esquerda(i,_,B,C),
+   move_esquerda(i,_,C,Resultado).
+   
+?- move_esquerda(i,_,[[b, b, a, f], [c, f, b, d], [b, d, c, e], [a, e, d, d], [c, a, e, e], [f, a, f, c]],A),
+   move_baixo(i,_,A,B),
+   move_direita(i,_,B,C),
+   move_direita(i,_,C,Resultado).
+*/
